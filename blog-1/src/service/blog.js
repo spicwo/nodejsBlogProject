@@ -1,22 +1,16 @@
-
+const { exec } = require('../dao/mysql');
 const getList = (author, keyword) => {
-    return [
-        {
-            id: 1,
-            title: '标题A',
-            content: '内容1',
-            createTime: 1609574630,
-            author: 'zhangsan'
-        },
-        {
-            id: 2,
-            title: '标题B',
-            content: '内容2',
-            createTime: 1609678888,
-            author: 'zhangsan'
-        }
-    ]
-
+    // 永远成立，1=1保证sql语句成立，不会报错
+    let sql = `select * from blogs where 1=1`
+    if (author) {
+        sql += ` and author = '${author}'`
+    }
+    if (keyword) {
+        sql += ` and title like '%${keyword}%'`
+    }
+    sql += ` order by createtime desc;`
+    // 返回promise
+    return exec(sql);
 }
 const getDetail = (id) => {
     return {

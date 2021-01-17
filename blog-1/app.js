@@ -41,24 +41,42 @@ const serverHandle = (req, res) => {
     req.query = querystring.parse(url.split('?')[1]);
     console.log(req.query, 'req.query')
 
+    req.cookie = {}
+    const cookieStr = req.headers.cookie || '';
+    cookieStr.split(';').forEach(item => {
+        if (!item) {
+            return;
+        }
+        const arr = item.split('=');
+        const key = arr[0];
+        const val = arr[1];
+        req.cookie[key] = val;
+    })
+    console.log('req.cookie is', req.cookie);
     // 处理postData
     getPostData(req).then(postData => {
         req.body = postData;
             // 处理blog 路由
-        const blogData = handleBlogRouter(req, res);
-        if (blogData) {
-            res.end(
-                JSON.stringify(blogData)
-            )
-            return;
+        const blogResult = handleBlogRouter(req, res);
+        if (blogResult) {
+            blogResult.then(blogData => {
+                res.end(
+                    JSON.stringify(blogData)
+                )
+            })
+            return
         }
+
         // 处理user路由
-        const userData = handleUserRouter(req, res);
-        if (userData) {
-            res.end(
-                JSON.stringify(userData)
-            )
+        const userResult = handleUserRouter(req, res);
+        if (userResult) {
+            userResult.then(userData => {
+                res.end(
+                    JSON.stringify(userData)
+                )    
+            })
             return;
+
         }
          
         // 未命中路由

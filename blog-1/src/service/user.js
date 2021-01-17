@@ -1,0 +1,11 @@
+const { exec } = require("../dao/mysql");
+
+const loginCheck = (username, password) => {
+    const sql = `select username, realname from user where username = '${username}' and password = '${password}';`
+    return exec(sql).then(rows => {
+        return rows[0] || {};
+    });
+}
+module.exports = {
+    loginCheck
+}
